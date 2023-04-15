@@ -13,7 +13,7 @@
 
 class Engen{
     asset_manager manager;
-    std::unique_ptr<sf::RenderWindow> window_;/// = std::make_unique<sf::RenderWindow>(sf::VideoMode(450, 450), "Chess!");
+    std::unique_ptr<sf::RenderWindow> window_;
     void input();
     void update(sf::Time const &dT);
 
@@ -48,14 +48,6 @@ void Engen::input() {
 
 }
 
-/*
-void Engen::draw() {
-    window_->clear();
-
-    window_->draw(background_);
-    window_->display();
-}*/
-
 void Engen::run() {
 
     sf::Clock clock;
@@ -65,8 +57,6 @@ void Engen::run() {
 
         input();
         update(dt);
-        ///draw();
-
     }
 
 }
