@@ -4,118 +4,102 @@
 
 #pragma once
 #include "game_settings.h"
+#include "AssetManager.h"
+#include <vector>
+#include <string>
 
+#define OPTIONS_N 3
 
-class option
+std::string background_file = {"../img/board0.png"};
+std::vector<std::string> files = {"../img/1111.png", "../img/222.png", "../img/333.png"};
+std::vector<std::pair<float, float>> pos = {std::make_pair(100, 30),
+                                            std::make_pair(100, 90),
+                                            std::make_pair(100, 150)};
+
+class main_menu
 {
-    sf::Text _text;
-    sf::Font _font;
-    int _text_size;
+    sf::Sprite options_[OPTIONS_N];
+    sf::Sprite bg_;
+    int menu_num_;
+    int check_option(sf::RenderWindow &window);
+    void select_option();
 
-    enum class options
+    enum  options
     {
-        one_player,
-        two_players,
-        rules,
-        back,
+        one_player = 0,
+        two_players = 1,
+        back = 2,
         white_side,
         black_side
-    } _option;
-
-public:
-    option(std::string message, int x, int y, int option_n) {
-        _font.loadFromFile("..\\data\\fonts\\arial.ttf");
-        _text.setFont(_font);
-        _text.setString(message);
-        _text.setPosition(x, y);
-        _text.setCharacterSize(70);
-        _text.setFillColor(sf::Color::Black);
-        _text_size = message.length();
-        _option = options(option_n);
-    }
-    sf::Text get_text() {
-        return _text;
     };
 
-
-    void click_option(sf::RenderWindow &window) {
-        sf::Vector2i mouse_pos = sf::Mouse::getPosition(window);
-        sf::Vector2i range_pos;
-        range_pos.x = _text.getPosition().x + _text.getCharacterSize() * (_text_size / 2);
-        range_pos.y = _text.getPosition().y + _text.getCharacterSize();
-
-        if(mouse_pos.x >= _text.getPosition().x && mouse_pos.x <= range_pos.x &&
-           mouse_pos.y >= _text.getPosition().y && mouse_pos.y <= range_pos.y) {
-
-            _text.setFillColor(sf::Color::Blue);
-            if (sf::Mouse::isButtonPressed(sf::Mouse::Left))
-            {
-                switch (_option)
-                {
-                    case options::one_player:
-                        isMenuDraw = false;
-                        isChooseColorDraw = true;
-                        break;
-                    case options::two_players:
-                        isMenuDraw = false;
-                        isTwoPlayersGameDraw = true;
-                        break;
-                    case options::rules:
-                        isMenuDraw = false;
-                        isRulesDraw = true;
-                        break;
-                    case options::back:
-                        isMenuDraw = true;
-                        break;
-                    case options::white_side:
-                        isOnePlayerGameDraw = true;
-                        isWhiteChoosen = true;
-                        isComputerTurn = false;
-                        break;
-                    case options::black_side:
-                        isOnePlayerGameDraw = true;
-                        isWhiteChoosen = false;
-                        isComputerTurn = true;
-                        break;
-                }
-            }
-        } else {
-            _text.setFillColor(sf::Color::Black);
-        }
-    }
+public:
+    main_menu();
+    void draw(sf::RenderWindow & window);
 };
 
+main_menu::main_menu() {
+    for(int i = 0; i < OPTIONS_N; ++i) {
+        options_[i].setTexture(asset_manager::get_texture(files[i]));
+        options_[i].setPosition(pos[i].first, pos[i].second);
+    }
 
-void menu(sf::RenderWindow &window)
-{
-    bool isRulesDraw = false;
-    bool isCreditsDraw = false;
-    bool isTwoPlayersGameDraw = false;
-    bool isOnePlayerGameDraw = false;
-    bool isChooseColorDraw = false;
+    bg_.setTexture(asset_manager::get_texture(background_file));
+    bg_.setPosition(282, 0);
+    menu_num_ = 0;
 
-    sf::RectangleShape background;
-    sf::Texture background_texture;
-    background_texture.loadFromFile("..\\images\\GameMenuBackground.jpg");
-    background.setPosition(5, 5);
-    background.setSize(sf::Vector2f(SCREEN_WIDTH, SCREEN_HEIGHT));
-    background.setTexture(&background_texture);
+}
+
+void main_menu::draw(sf::RenderWindow &window) {
+    while (is_menu_draw) {
+        for(int i = 0; i < OPTIONS_N; ++i) {
+            options_[i].setColor(sf::Color::White);
+        }
+        menu_num_ = 0;
+        window.clear(sf::Color(129, 181, 221));
+
+        menu_num_ = check_option(window);
+        if(sf::Keyboard::isKeyPressed(sf::Keyboard::Escape)) {window.close(); is_menu_draw = false; }
+        if(is_game_end) {window.close();}
+
+        window.draw(bg_);
+
+        for(int i = 0; i < OPTIONS_N; ++i) {
+            window.draw(options_[i]);
+        }
+
+        if (sf::Mouse::isButtonPressed(sf::Mouse::Left))
+            select_option();
 
 
-    option one_player("1 Player", 200, 120, 0);
-    option two_players("2 Players", 200, 220, 1);
-    option rules("Rules", 200, 320, 2);
+        window.display();
+    }
+}
 
+int main_menu::check_option(sf::RenderWindow &window) {
+    for(int i = 0; i < OPTIONS_N; ++i) {
+        if(sf::IntRect(pos[i].first, pos[i].second, 300, 50).contains(sf::Mouse::getPosition(window))) {
+            options_[i].setColor(sf::Color::Blue);
+            return i;
+        }
+    }
+}
 
-    one_player.click_option(window);
-    two_players.click_option(window);
-    rules.click_option(window);
+void main_menu::select_option() {
 
-    window.clear();
-    window.draw(background);
-    window.draw(one_player.get_text());
-    window.draw(two_players.get_text());
-    window.draw(rules.get_text());
-    window.display();
+    switch (menu_num_) {
+        case options::one_player:
+            is_menu_draw = false;
+            is_choose_color_draw = true;
+            break;
 
+        case options::two_players:
+            is_menu_draw = false;
+            isTwoPlayersGameDraw = true;
+            break;
+
+        case options::back:
+            is_game_end = true;
+            break;
+    }
 }

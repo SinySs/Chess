@@ -13,15 +13,15 @@
 
 bool isWhiteChoosen;
 bool isComputerTurn;
-bool isMenuDraw = true;
+bool is_menu_draw = true;
 bool isRulesDraw = false;
-bool isCreditsDraw = false;
+bool is_game_end = false;
 bool isTwoPlayersGameDraw = false;
 bool isOnePlayerGameDraw = false;
-bool isChooseColorDraw = false;
+bool is_choose_color_draw = false;
 bool isFigureTake = false;
 
-const int SCREEN_HEIGHT = 650, SCREEN_WIDTH = 650;
+const int SCREEN_HEIGHT = 450, SCREEN_WIDTH = 450;
 
 enum class figure_t
 {
